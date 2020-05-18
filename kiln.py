@@ -13,6 +13,7 @@ epi = """
 Running these tests will destroy all the data on any drive being tested. It may even permenantly damage the drive. Use with caution.
 """
 
+from os import path
 import argparse
 import glob
 import importlib
@@ -46,7 +47,8 @@ if opts.list_mods or opts.all_mods:
     logger.debug("Searching for modules in tests/ folder.")
     mod_files = glob.glob('tests/*.py')
     for mod in mod_files:
-        modules.append(mod.split('/')[-1].rstrip(".py"))
+        logger.debug("Found " + mod)
+        modules.append(path.splitext(path.basename(mod))[0])
 elif len(opts.modules) > 0:
     modules = opts.modules
 else:

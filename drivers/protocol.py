@@ -44,15 +44,20 @@ class protocol:
 
 
     def get_info(self):
-        self.info = "Drive Info Placeholder"
+        self.info = "Drive Info Unavailable"
 
 
     def get_log(self):
-        self.log = "Log Page Placeholder"
+        self.log = "Log Page Unavailable"
 
 
     def get_temp(self):
         self.log = "Temperature Unavailable"
+
+
+    def get_wear(self):
+        self.wearout = "Wear Level Unavailable"
+        self.reserved = "Reserved Space Unavailable"
 
 
     def print_info(self):
@@ -65,6 +70,11 @@ class protocol:
         
     def print_temp(self):
         print(self.temperature)
+
+
+    def print_wear(self):
+        print(self.wearout)
+        print(self.reserved)
 
 
     def write_block(self, address, data):

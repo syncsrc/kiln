@@ -17,10 +17,17 @@ class scsi(protocol):
         dev_info = subprocess.Popen(["sg_inq", self.dev], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         self.info = dev_info.stdout.readlines()
 
-
     def get_temp(self):
-        dev_info = subprocess.Popen(["sg_logs", "-p", "0x0d", self.dev], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        dev_info = subprocess.Popen(["sg_logs", "-t", self.dev], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         for line in dev_info.stdout.readlines():
             logger.debug(line)
             if "Current temperature" in str(line):
                 self.temperature = str(line).split('=')[-1]
+
+    def get_wear(self):
+        dev_info = subprocess.Popen(["sg_logs", "-p", "0x11", self.dev], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        for line in dev_info.stdout.readlines():
+            logger.debug(line)
+            if "endurance indicator" in str(line):
+                self.wearout = str(line)
+            self.reserved = "Not available"

@@ -27,3 +27,12 @@ class nvme(protocol):
             logger.debug(line)
             if "temperature" in str(line):
                 self.temperature = str(line).split(':')[-1]
+
+    def get_wear(self):
+        dev_info = subprocess.Popen(["nvme", "smart-log", self.dev], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        for line in dev_info.stdout.readlines():
+            logger.debug(line)
+            if "percentage_used" in str(line):
+                self.wearout = str(line)
+            if "available_spare" in str(line):
+                self.reserved = str(line)
