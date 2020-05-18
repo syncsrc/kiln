@@ -13,15 +13,20 @@ epi = """
 Running these tests will destroy all the data on any drive being tested. It may even permenantly damage the drive. Use with caution.
 """
 
-from os import path
+import os
 import argparse
 import glob
 import importlib
 import logging
 
 ## Setup debug messages
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('kiln')
+
+## Nothing about this will work otherwise
+if os.geteuid() != 0:
+    logger.error("Running as " + os.getlogin() + " instead of root.")
+    exit("This test suite requires raw access to block devices. Please re-run as root.")
 
 ## Get command-line options
 parser = argparse.ArgumentParser(description=info, epilog=epi)
@@ -48,7 +53,7 @@ if opts.list_mods or opts.all_mods:
     mod_files = glob.glob('tests/*.py')
     for mod in mod_files:
         logger.debug("Found " + mod)
-        modules.append(path.splitext(path.basename(mod))[0])
+        modules.append(os.path.splitext(os.path.basename(mod))[0])
 elif len(opts.modules) > 0:
     modules = opts.modules
 else:
