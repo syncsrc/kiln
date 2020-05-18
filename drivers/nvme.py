@@ -4,11 +4,11 @@
 
 import subprocess
 import os
-from drivers.protocol import protocol
+from drivers.generic import generic
 import logging
 logger = logging.getLogger('kiln')
 
-class nvme(protocol):
+class nvme(generic):
 
     name = "NVME"
     required = ["dd", "nvme"]

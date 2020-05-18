@@ -4,11 +4,11 @@
 
 import subprocess
 import os
-from drivers.protocol import protocol
+from drivers.generic import generic
 import logging
 logger = logging.getLogger('kiln')
 
-class sata(protocol):
+class sata(generic):
 
     name = "SATA"
     required = ["dd", "smartctl", "hdparm"]

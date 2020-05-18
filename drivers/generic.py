@@ -5,11 +5,12 @@
 import pprint
 import subprocess
 import os
+import time
 from shutil import which
 import logging
 logger = logging.getLogger('kiln')
 
-class protocol:
+class generic:
 
     name = "GENERIC"
     required = []
@@ -103,3 +104,28 @@ class protocol:
             output, error = dev_info.communicate()
             logger.debug(output)
             return output
+
+
+    def write_thruput(self):
+        address = 0   ## TODO: does changing this affect performance?
+        bs = 2**20    ## TODO: is this a good choice?
+        data_size = bs * 512 # int(self.size_pb)
+        while data_size/int(self.size_lb) > int(self.max_lba):
+            data_size = data_size / 2
+        count = int(data_size / bs)
+        tmpfile = os.path.dirname(__file__) + "/tmp.bin"
+        logger.info("Filling temporary file " + tmpfile + " with " + str(data_size) + " bytes of random data.")
+        f = open(tmpfile, "wb")
+        f.write(os.urandom(data_size))
+        f.close()
+        logger.info("Writing " + str(data_size) + " bytes to " + self.dev)
+        start = time.time()
+        dev_info = subprocess.Popen(["dd", "if="+tmpfile, "of="+self.dev, "oflag=direct", "conv=fsync", "seek="+str(address), \
+                                     "count="+str(count), "bs="+str(bs)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output, error = dev_info.communicate()
+        end = time.time()
+        #logger.debug(' '.join(dev_info.args))
+        logger.debug(output + error)
+        logger.debug("Wrote " + str(data_size) + " bytes in " + str(end-start) + " seconds.")
+        logger.debug("Estimated write speed of " + str(data_size/(end-start)) + " bytes per sec")
+        return data_size/(end-start)

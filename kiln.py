@@ -44,6 +44,31 @@ parser.add_argument('-i', '--iterations', dest='iterations', type=int, default=1
                     help='Number of times to run a module. Cannot be used if more than one module is specified.')
 opts = parser.parse_args()
 
+## Don't commit seppuku
+script_device = '{:04X}'.format(os.stat(os.path.realpath(__file__)).st_dev)
+logger.debug("kiln.py located on device " + script_device)
+if len(script_device) == 4:
+    major = script_device[0:2].lstrip('0')
+    minor = script_device[2:4].lstrip('0')
+    logger.debug("kiln.py location major id = " + major + " and minor id = " + minor)
+else:
+    exit("Failed to parse device ID of drive kiln.py is located on.")
+f = open("/proc/partitions", "r")
+partitions = f.readlines()
+f.close()
+for line in partitions:
+    if (len(line.split()) == 4) and (line.split()[0] == major) and (line.split()[1] == minor):
+        script_part = line.split()[3]
+        logger.debug("found partition for kiln.py on " + script_part)
+if script_part == None:
+    exit("Couldn't figure out which partition kiln.py is located on, something is wrong.")
+else:
+    if script_part[0:3] in opts.dev:
+        logger.error("Cannot test " + opts.dev + " when kiln.py is on " + script_part[0:3])
+        exit("Committing seppuku is not permitted.")
+    else:
+        logger.debug("Safe to test " + opts.dev + " since kiln.py is on " + script_part[0:3])
+
 # get working list of modules
 #   if "all" or "list" option is selected, get all the available modules
 #   else use modules specified via -m command line option

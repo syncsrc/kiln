@@ -4,11 +4,11 @@
 
 import subprocess
 import os
-from drivers.protocol import protocol
+from drivers.generic import generic
 import logging
 logger = logging.getLogger('kiln')
 
-class scsi(protocol):
+class scsi(generic):
 
     name = "SCSI"
     required = ["dd", "sg_inq", "sg_format", "sg_logs"]
